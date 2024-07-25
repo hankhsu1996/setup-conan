@@ -1,5 +1,7 @@
 # Setup Conan Environment
 
+[![CI](https://github.com/hankhsu1996/setup-conan/actions/workflows/test.yml/badge.svg)](https://github.com/hankhsu1996/setup-conan/actions/workflows/test.yml)
+
 This GitHub Action sets up a Python environment, installs Conan, and optionally caches the Conan home directory and pip packages for Conan.
 
 ## Inputs
@@ -12,7 +14,7 @@ This GitHub Action sets up a Python environment, installs Conan, and optionally 
 - **`python-version`**
 
   - _Optional_: The version of Python to use. Default: `3.x`
-  - Uses semantic versioning for the setup-python action.
+  - Uses semantic versioning for the [setup-python](https://github.com/actions/setup-python) action.
 
 - **`conan-home`**
 
