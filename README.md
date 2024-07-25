@@ -1,30 +1,29 @@
-# Setup Conan with Python
+# Setup Conan Environment
 
-This action sets up Conan with Python, and optionally caches the Conan home directory and the Conan tool itself.
+This GitHub Action sets up a Python environment, installs Conan, and optionally caches the Conan home directory and pip packages for Conan.
 
 ## Inputs
 
-### `conan-version`
+- **`conan-version`**
 
-**Optional** The version of Conan to install. Default is the latest version.
+  - _Optional_: The version of Conan to install. Default: `2.*`
 
-### `python-version`
+- **`python-version`**
 
-**Optional** The version of Python to use. Default is Python 3 latest version.
+  - _Optional_: The version of Python to use. Default: `3.x`
 
-### `conan-home`
+- **`conan-home`**
 
-**Optional** The Conan home directory. Default is `~/.conan` for Conan 1 and `~/.conan2` for Conan 2. If custom Conan home directory is provided, the action will set the `CONAN_HOME` environment variable to the provided directory.
+  - _Optional_: The Conan home directory. Default: `~/.conan` for Conan 1 and `~/.conan2` for Conan 2. If a custom Conan home directory is provided, the action sets the `CONAN_HOME` environment variable to the specified directory.
 
-### `cache-dependencies`
+- **`cache-dependencies`**
 
-**Optional** Whether to cache the Conan home directory in which dependencies are stored. Default is `false`.
+  - _Optional_: Whether to cache the Conan home directory. Default: `false`
 
-### `cache-tool`
+- **`cache-tool`**
+  - _Optional_: Whether to cache the Conan tool (pip packages). Default: `false`
 
-**Optional** Whether to cache the Conan tool itself. This means caching pip packages. Default is `false`.
-
-## Example usage
+## Example Usage
 
 ```yaml
 uses: actions/setup-conan@v1
@@ -35,3 +34,14 @@ with:
   cache-dependencies: true
   cache-tool: true
 ```
+
+## Summary of Key Steps
+
+- **Python Environment Setup**: Automatically configures the specified Python version.
+- **Conan Installation**: Installs the specified version of Conan via pip.
+- **Caching Options**: Optional caching of the Conan home directory and pip packages to enhance performance.
+
+### Notes
+
+- Ensure that the specified `conan-home` directory aligns with your Conan version to avoid conflicts.
+- Utilize caching to speed up subsequent runs by preserving the Conan environment between builds.
