@@ -50,7 +50,7 @@ runs:
       run: |
         temp_dir=$(pwd)/temp
         mkdir -p $temp_dir
-        if [ -z "${{ inputs.conan-version }}" ]; then
+        if [[ -z "${{ inputs.conan-version }}" ]]; then
           echo "conan" > $temp_dir/requirements.txt
         else
           echo "conan==${{ inputs.conan-version }}" > $temp_dir/requirements.txt
@@ -77,7 +77,7 @@ runs:
     - name: Resolved Python version
       id: resolve-python-version
       run: |
-        if [ "${{ inputs.cache-tool }} == "true" ]; then
+        if [[ "${{ inputs.cache-tool }}" == "true" ]]; then
           echo "python-version=${{ steps.setup-python.outputs.python-version }}" >> $GITHUB_OUTPUT
           echo "cache-tool-hit=${{ steps.setup-python.outputs.cache-hit }}" >> $GITHUB_OUTPUT
         else
@@ -103,7 +103,7 @@ runs:
       id: determine-conan-home
       run: |
         echo "Determining Conan Home"
-        if [ -z "${{ inputs.conan-home }}" ]; then
+        if [[ -z "${{ inputs.conan-home }}" ]]; then
           if [[ "${{ steps.resolve-conan-version.outputs.conan-version }}" == 2* ]]; then
             echo "Setting conan-home to $HOME/.conan2"
             echo "conan-home=$HOME/.conan2" >> $GITHUB_OUTPUT
@@ -131,7 +131,7 @@ runs:
     - name: Set Dependency Cache Hit Output
       id: set-deps-cache-hit
       run: |
-        if [[ ${{ inputs.cache-dependencies }} == 'true' ]]; then
+        if [[ "${{ inputs.cache-dependencies }}" == 'true' ]]; then
           echo "cache-dependencies-hit=${{ steps.cache-conan-packages.outputs.cache-hit }}" >> $GITHUB_OUTPUT
         else
           echo "cache-dependencies-hit=false" >> $GITHUB_OUTPUT
