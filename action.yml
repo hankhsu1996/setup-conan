@@ -69,14 +69,14 @@ runs:
       with:
         python-version: ${{ inputs.python-version }}
 
-    - name: Set resolved Python version output
+    - name: Set resolved Python version output (cached)
       if: ${{ inputs.cache-tool == 'true' }}
       run: |
         echo "python-version=${{ steps.setup-python.outputs.python-version }}" >> $GITHUB_OUTPUT
         echo "cache-tool-hit=${{ steps.setup-python.outputs.cache-hit }}" >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Set resolved Python version output
+    - name: Set resolved Python version output (no cache)
       if: ${{ inputs.cache-tool != 'true' }}
       run: |
         echo "python-version=${{ steps.setup-python-no-cache.outputs.python-version }}" >> $GITHUB_OUTPUT
@@ -124,8 +124,14 @@ runs:
         restore-keys: |
           conan-${{ steps.get-conan-version.outputs.conan-version }}-${{ runner.os }}-
 
-    - name: Set Dependency Cache Hit Output
+    - name: Set Dependency Cache Hit Output (cached)
       if: ${{ inputs.cache-dependencies == 'true' }}
       run: |
         echo "cache-dependencies-hit=${{ steps.cache-conan-packages.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Set Dependency Cache Hit Output (non-cached)
+      if: ${{ inputs.cache-dependencies != 'true' }}
+      run: |
+        echo "cache-dependencies-hit=false" >> $GITHUB_OUTPUT
       shell: bash
