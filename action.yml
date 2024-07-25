@@ -116,6 +116,7 @@ runs:
       shell: bash
 
     - name: Cache Conan Packages
+      id: cache-conan-packages
       if: ${{ inputs.cache-dependencies == 'true' }}
       uses: actions/cache@v4
       with:
