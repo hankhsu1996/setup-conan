@@ -1,0 +1,93 @@
+name: "Setup Conan with Python"
+description: "Setup Python and then run Setup Conan"
+
+inputs:
+  conan-version:
+    description: "Version of Conan to install"
+    required: false
+    default: "2.*"
+  python-version:
+    description: "Version of Python to install"
+    required: false
+    default: "3.x"
+  conan-home:
+    description: "Custom Conan home directory"
+    required: false
+  cache-dependencies:
+    description: "Cache Conan dependencies"
+    required: false
+    default: "false"
+  cache-tool:
+    description: "Cache Conan tool (pip dependencies)"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create requirements.txt for Conan and Colorama
+      run: |
+        temp_dir=$(pwd)/temp
+        mkdir -p $temp_dir
+        if [ -z "${{ inputs.conan-version }}" ]; then
+          echo "conan" > $temp_dir/requirements.txt
+        else
+          echo "conan==${{ inputs.conan-version }}" > $temp_dir/requirements.txt
+        fi
+        echo "colorama" >> $temp_dir/requirements.txt
+        echo "requirements-txt=$temp_dir/requirements.txt" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Setup Python
+      if: ${{ inputs.cache-tool == 'true' }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: "pip"
+
+    - name: Setup Python without Cache
+      if: ${{ inputs.cache-tool != 'true' }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install Conan and Colorama
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r $(pwd)/temp/requirements.txt
+      shell: bash
+
+    - name: Get the resolved Conan version
+      id: get-conan-version
+      run: |
+        echo "Getting resolved Conan version"
+        conan --version | awk '{print $NF}' | xargs -I {} echo "conan-version={}" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Determine Conan Home
+      id: determine-conan-home
+      run: |
+        echo "Determining Conan Home"
+        if [ -z "${{ inputs.conan-home }}" ]; then
+          if [[ "${{ steps.get-conan-version.outputs.conan-version }}" == 2* ]]; then
+            echo "Setting conan-home to $HOME/.conan2"
+            echo "conan-home=$HOME/.conan2" >> $GITHUB_OUTPUT
+          else
+            echo "Setting conan-home to $HOME/.conan"
+            echo "conan-home=$HOME/.conan" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "Setting conan-home to user-provided value: ${{ inputs.conan-home }}"
+          echo "conan-home=${{ inputs.conan-home }}" >> $GITHUB_OUTPUT
+          echo "CONAN_HOME=${{ inputs.conan-home }}" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Cache Conan Packages
+      if: ${{ inputs.cache-dependencies == 'true' }}
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.determine-conan-home.outputs.conan-home }}
+        key: conan-${{ steps.get-conan-version.outputs.conan-version }}-${{ runner.os }}-${{ hashFiles('**/conanfile.*') }}
+        restore-keys: |
+          conan-${{ steps.get-conan-version.outputs.conan-version }}-${{ runner.os }}-

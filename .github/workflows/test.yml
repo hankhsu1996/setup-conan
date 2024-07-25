@@ -1,0 +1,78 @@
+name: Test Setup Conan Action
+
+on: [push, pull_request]
+
+jobs:
+  setup-conan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        conan-version: ["", "2.4.0"]
+        conan-home: ["", "~/.custom-conan"]
+        cache-dependencies: ["true", "false"]
+        cache-tool: ["true", "false"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Conan
+        id: setup-conan
+        uses: ./
+        with:
+          conan-version: ${{ matrix.conan-version }}
+          conan-home: ${{ matrix.conan-home }}
+          cache-dependencies: ${{ matrix.cache-dependencies }}
+          cache-tool: ${{ matrix.cache-tool }}
+
+      - name: Verify Conan installation and configuration
+        run: |
+          echo "CONAN_HOME: $CONAN_HOME"
+          conan --version
+          conan config home
+
+      - name: Build the project
+        working-directory: test-project
+        run: |
+          conan profile detect --force
+          conan install . --output-folder=build --build=missing
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build .
+
+  test-cache:
+    runs-on: ubuntu-latest
+    needs: setup-conan
+    strategy:
+      matrix:
+        conan-version: ["", "2.4.0"]
+        conan-home: ["", "~/.custom-conan"]
+        cache-dependencies: ["true", "false"]
+        cache-tool: ["true", "false"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Conan
+        id: setup-conan
+        uses: ./
+        with:
+          conan-version: ${{ matrix.conan-version }}
+          conan-home: ${{ matrix.conan-home }}
+          cache-dependencies: ${{ matrix.cache-dependencies }}
+          cache-tool: ${{ matrix.cache-tool }}
+
+      - name: Verify Conan version and configuration
+        run: |
+          conan --version
+          conan config home
+
+      - name: Build the project
+        working-directory: test-project
+        run: |
+          conan profile detect --force
+          conan install . --output-folder=build --build=missing
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build .
