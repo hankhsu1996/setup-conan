@@ -1,5 +1,5 @@
-name: "Setup Conan with Python"
-description: "Setup Python and then run Setup Conan"
+name: "Setup Conan Environment"
+description: "Configure Python and install Conan with optional caching for dependencies and tools to streamline your CI workflow."
 author: "Shou-Li Hsu"
 branding:
   icon: "package"
