@@ -82,7 +82,7 @@ runs:
           echo "cache-tool-hit=${{ steps.setup-python.outputs.cache-hit }}" >> $GITHUB_OUTPUT
         else
           echo "python-version=${{ steps.setup-python-no-cache.outputs.python-version }}" >> $GITHUB_OUTPUT
-          echo "cache-tool-hit=${{ steps.setup-python-no-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+          echo "cache-tool-hit=false }}" >> $GITHUB_OUTPUT
         fi
       shell: bash
 
