@@ -7,10 +7,12 @@ This GitHub Action sets up a Python environment, installs Conan, and optionally 
 - **`conan-version`**
 
   - _Optional_: The version of Conan to install. Default: `2.*`
+  - Uses pip versioning.
 
 - **`python-version`**
 
   - _Optional_: The version of Python to use. Default: `3.x`
+  - Uses semantic versioning for the setup-python action.
 
 - **`conan-home`**
 
