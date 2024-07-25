@@ -1,6 +1,6 @@
 # Setup Conan Environment
 
-[![CI](https://github.com/hankhsu1996/setup-conan/actions/workflows/test.yml/badge.svg)](https://github.com/hankhsu1996/setup-conan/actions/workflows/test.yml)
+[![CI](https://github.com/hankhsu1996/setup-conan/actions/workflows/ci.yml/badge.svg?event=schedule)](https://github.com/hankhsu1996/setup-conan/actions/workflows/ci.yml)
 
 This GitHub Action sets up a Python environment, installs Conan, and optionally caches the Conan home directory and pip packages for Conan.
 

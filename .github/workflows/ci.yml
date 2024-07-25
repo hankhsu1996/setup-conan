@@ -1,6 +1,14 @@
-name: Test Setup Conan Action
+name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * *" # Daily at midnight UTC
 
 jobs:
   setup-conan:
@@ -67,6 +75,17 @@ jobs:
         run: |
           conan --version
           conan config home
+
+      - name: Validate Cache Hits
+        run: |
+          if [ "${{ steps.setup-conan.outputs.cache-dependencies-hit }}" != "${{ matrix.cache-dependencies }}" ]; then
+            echo "Cache dependencies hit mismatch: Expected ${{ matrix.cache-dependencies }} but got ${{ steps.setup-conan.outputs.cache-dependencies-hit }}"
+            exit 1
+          fi
+          if [ "${{ steps.setup-conan.outputs.cache-tool-hit }}" != "${{ matrix.cache-tool }}" ]; then
+            echo "Cache tool hit mismatch: Expected ${{ matrix.cache-tool }} but got ${{ steps.setup-conan.outputs.cache-tool-hit }}"
+            exit 1
+          fi
 
       - name: Build the project
         working-directory: test-project
