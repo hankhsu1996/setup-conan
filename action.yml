@@ -1,5 +1,9 @@
 name: "Setup Conan with Python"
 description: "Setup Python and then run Setup Conan"
+author: "Shou-Li Hsu"
+branding:
+  icon: "package"
+  color: "blue"
 
 inputs:
   conan-version:
