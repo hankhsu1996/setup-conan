@@ -1,6 +1,13 @@
-name: Test Setup Conan Action
+name: CI
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 0 * * *" # Daily at midnight UTC
+  workflow_dispatch:
+  release:
+    types: [published]
 
 jobs:
   setup-conan:
