@@ -74,12 +74,14 @@ runs:
       run: |
         echo "python-version=${{ steps.setup-python.outputs.python-version }}" >> $GITHUB_OUTPUT
         echo "cache-tool-hit=${{ steps.setup-python.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+      shell: bash
 
     - name: Set resolved Python version output
       if: ${{ inputs.cache-tool != 'true' }}
       run: |
         echo "python-version=${{ steps.setup-python-no-cache.outputs.python-version }}" >> $GITHUB_OUTPUT
         echo "cache-tool-hit=${{ steps.setup-python-no-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+      shell: bash
 
     - name: Install Conan and Colorama
       run: |
@@ -126,3 +128,4 @@ runs:
       if: ${{ inputs.cache-dependencies == 'true' }}
       run: |
         echo "cache-dependencies-hit=${{ steps.cache-conan-packages.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+      shell: bash
