@@ -26,6 +26,18 @@ inputs:
     required: false
     default: "false"
 
+outputs:
+  conan-version:
+    description: "Resolved Conan version"
+  python-version:
+    description: "Resolved Python version"
+  conan-home:
+    description: "Resolved Conan home directory"
+  cache-dependencies-hit:
+    description: "Whether Conan dependencies cache hit"
+  cache-tool-hit:
+    description: "Whether Conan tool cache hit"
+
 runs:
   using: "composite"
   steps:
@@ -43,6 +55,7 @@ runs:
       shell: bash
 
     - name: Setup Python
+      id: setup-python
       if: ${{ inputs.cache-tool == 'true' }}
       uses: actions/setup-python@v5
       with:
@@ -50,10 +63,23 @@ runs:
         cache: "pip"
 
     - name: Setup Python without Cache
+      id: setup-python-no-cache
       if: ${{ inputs.cache-tool != 'true' }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
+
+    - name: Set resolved Python version output
+      if: ${{ inputs.cache-tool == 'true' }}
+      run: |
+        echo "python-version=${{ steps.setup-python.outputs.python-version }}" >> $GITHUB_OUTPUT
+        echo "cache-tool-hit=${{ steps.setup-python.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+
+    - name: Set resolved Python version output
+      if: ${{ inputs.cache-tool != 'true' }}
+      run: |
+        echo "python-version=${{ steps.setup-python-no-cache.outputs.python-version }}" >> $GITHUB_OUTPUT
+        echo "cache-tool-hit=${{ steps.setup-python-no-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
 
     - name: Install Conan and Colorama
       run: |
@@ -61,11 +87,11 @@ runs:
         python -m pip install -r $(pwd)/temp/requirements.txt
       shell: bash
 
-    - name: Get the resolved Conan version
+    - name: Set Resolved Conan Version
       id: get-conan-version
       run: |
         echo "Getting resolved Conan version"
-        conan --version | awk '{print $NF}' | xargs -I {} echo "conan-version={}" >> $GITHUB_OUTPUT
+        conan --version | awk '{print $3}' | xargs -I {} echo "conan-version={}" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Determine Conan Home
@@ -95,3 +121,8 @@ runs:
         key: conan-${{ steps.get-conan-version.outputs.conan-version }}-${{ runner.os }}-${{ hashFiles('**/conanfile.*') }}
         restore-keys: |
           conan-${{ steps.get-conan-version.outputs.conan-version }}-${{ runner.os }}-
+
+    - name: Set Dependency Cache Hit Output
+      if: ${{ inputs.cache-dependencies == 'true' }}
+      run: |
+        echo "cache-dependencies-hit=${{ steps.cache-conan-packages.outputs.cache-hit }}" >> $GITHUB_OUTPUT
