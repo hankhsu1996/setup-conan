@@ -137,3 +137,19 @@ runs:
           echo "cache-dependencies-hit=false" >> $GITHUB_OUTPUT
         fi
       shell: bash
+
+    - name: Configure Conan Remote
+      run: |
+        CONAN_VERSION="${{ steps.resolve-conan-version.outputs.conan-version }}"
+        if [[ "$CONAN_VERSION" =~ ^2\..* ]]; then
+          if ! conan remote list | grep -q "conancenter"; then
+            echo "Adding conancenter remote for Conan 2.x"
+            conan remote add conancenter https://center2.conan.io
+          else
+            echo "Updating conancenter remote to https://center2.conan.io"
+            conan remote update conancenter --url https://center2.conan.io
+          fi
+        else
+          echo "Conan 1.x detected; skipping remote update to center2.conan.io"
+        fi
+      shell: bash
